@@ -41,7 +41,7 @@ spring:
         - id: auth-service
           uri: lb://AQUASENSE-AUTH-SERVICE
           predicates:
-            - Path=/api/auth/**, /api/login/**, /api/register/**
+            - Path=/api/v1/aquasense/auth/**, /api/login/**, /api/register/**
           filters:
             - name: CircuitBreaker
               args:
@@ -51,7 +51,7 @@ spring:
         - id: user-service
           uri: lb://AQUASENSE-USER-SERVICE
           predicates:
-            - Path=/api/user/**
+            - Path=/api/v1/aquasense/user/**
           filters:
             - name: CircuitBreaker
               args:
@@ -61,7 +61,7 @@ spring:
         - id: device-service
           uri: lb://AQUASENSE-DEVICE-SERVICE
           predicates:
-            - Path=/api/device/**
+            - Path=/api/v1/aquasense/device/**
           filters:
             - name: CircuitBreaker
               args:
@@ -71,7 +71,7 @@ spring:
         - id: hub-service
           uri: lb://AQUASENSE-HUB-SERVICE
           predicates:
-            - Path=/api/hub/**
+            - Path=/api/v1/aquasense/hub/**
           filters:
             - name: CircuitBreaker
               args:
@@ -81,22 +81,12 @@ spring:
         - id: sensor-service
           uri: lb://AQUASENSE-SENSOR-SERVICE
           predicates:
-            - Path=/api/sensor/**
+            - Path=/api/v1/aquasense/sensor/**
           filters:
             - name: CircuitBreaker
               args:
                 name: sensorCircuit
                 fallbackUri: forward:/fallback/sensor
-
-        - id: bff-service
-          uri: lb://AQUASENSE-BFF-SERVICE
-          predicates:
-            - Path=/api/bff/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: bffCircuit
-                fallbackUri: forward:/fallback/bff
 
 
 eureka:
