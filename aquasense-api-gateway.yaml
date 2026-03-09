@@ -1,0 +1,153 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: aquasense-api-gateway
+
+  main:
+    banner-mode: off
+
+  cloud:
+    gateway:
+
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+        - id: aquasense-api-gateway
+          uri: lb://AQUASENSE-API-GATEWAY
+          predicates:
+            - Path=/api/v1/gateway/**
+
+        - id: auth-service
+          uri: lb://AQUASENSE-AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**, /api/login/**, /api/register/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: authCircuit
+                fallbackUri: forward:/fallback/auth
+
+        - id: user-service
+          uri: lb://AQUASENSE-USER-SERVICE
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userCircuit
+                fallbackUri: forward:/fallback/user
+
+        - id: device-service
+          uri: lb://AQUASENSE-DEVICE-SERVICE
+          predicates:
+            - Path=/api/device/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: deviceCircuit
+                fallbackUri: forward:/fallback/device
+
+        - id: hub-service
+          uri: lb://AQUASENSE-HUB-SERVICE
+          predicates:
+            - Path=/api/hub/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: hubCircuit
+                fallbackUri: forward:/fallback/hub
+
+        - id: sensor-service
+          uri: lb://AQUASENSE-SENSOR-SERVICE
+          predicates:
+            - Path=/api/sensor/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: sensorCircuit
+                fallbackUri: forward:/fallback/sensor
+
+        - id: bff-service
+          uri: lb://AQUASENSE-BFF-SERVICE
+          predicates:
+            - Path=/api/bff/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: bffCircuit
+                fallbackUri: forward:/fallback/bff
+
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 15
+    leaseExpirationDurationInSeconds: 15
+
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    registryFetchIntervalSeconds: 5
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+
+      authCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      userCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      deviceCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      hubCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      sensorCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      bffCircuit:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+
+logging:
+  level:
+    root: info
+    org.springframework.cloud.gateway: debug
