@@ -1,0 +1,30 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: aquasense-service-discovery
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+  server:
+    wait-time-in-ms-when-sync-empty: 0
+    enable-self-preservation: true
+
+  instance:
+    hostname: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,metrics
+
+logging:
+  level:
+    root: INFO
+    com.netflix.eureka: INFO
+    org.springframework: INFO
